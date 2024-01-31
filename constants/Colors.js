@@ -3,7 +3,7 @@ export const Colors = {
     Black_color: "#222222",
     primary: "#007260",
     secondary: "#39B68D",
-    gray_color: "#cccccc" 
+    gray_color: "#cccccc",
 }
 
 

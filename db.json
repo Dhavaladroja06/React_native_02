@@ -1,0 +1,40 @@
+{
+  "UserData": [
+    {
+      "userData": {
+        "email": "dhavaladroja207@gmail.com",
+        "phoneNumber": "8878848455",
+        "password": "vvfbxbcb",
+        "agreedToTerms": true
+      },
+      "id": 1
+    },
+    {
+      "userData": {
+        "email": "djskd@djdd.com",
+        "phoneNumber": "8155454584",
+        "password": "vxjxjgmx",
+        "agreedToTerms": true
+      },
+      "id": 2
+    },
+    {
+      "userData": {
+        "email": "abc@gma.com",
+        "phoneNumber": "4657345615",
+        "password": "asdasdas",
+        "agreedToTerms": true
+      },
+      "id": 3
+    },
+    {
+      "userData": {
+        "email": "raj@gmail.com",
+        "phoneNumber": "8646543886",
+        "password": "12345678",
+        "agreedToTerms": true
+      },
+      "id": 4
+    }
+  ]
+}

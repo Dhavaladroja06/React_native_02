@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Linking,
 } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -13,10 +14,55 @@ import { Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
 import Button from "../components/Button";
 import { Colors } from "../constants/Colors";
+import { addUser } from "../hooks/useUserData";
 
 const Signup = ({ navigation }) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [phoneNumberError, setPhoneNumberError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  const handleGoogleSignup = () => {
+    Linking.openURL("https://accounts.google.com/signup");
+  };
+
+  const handleFacebookSignup = () => {
+    Linking.openURL("https://www.facebook.com/r.php");
+  };
+
+  const handleSignup = async () => {
+    if (!email) {
+      setEmailError("Email is required");
+      return;
+    }
+    if (!phoneNumber) {
+      setPhoneNumberError("Phone number is required");
+      return;
+    }
+    if (!password) {
+      setPasswordError("Password is required");
+      return;
+    }
+
+    const userData = {
+      email: email,
+      phoneNumber: phoneNumber,
+      password: password,
+      agreedToTerms: isChecked,
+    };
+
+    try {
+      await addUser({userData})
+      navigation.navigate("Login")
+    } catch (error) {
+      console.error("Error signing up:", error)
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeAreaview}>
       <View style={styles.container}>
@@ -34,11 +80,13 @@ const Signup = ({ navigation }) => {
               placeholder="Enter your email address"
               placeholderTextColor={Colors.Black_color}
               keyboardType="email-address"
+              onChangeText={setEmail}
               style={{
                 width: "100%",
               }}
             />
           </View>
+          {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
         </View>
 
         <View style={{ marginBottom: 12 }}>
@@ -51,12 +99,16 @@ const Signup = ({ navigation }) => {
               placeholder="Enter your phone number"
               placeholderTextColor={Colors.Black_color}
               keyboardType="numeric"
+              onChangeText={setPhoneNumber}
               style={{
                 width: "100%",
               }}
               maxLength={10}
             />
           </View>
+          {phoneNumberError ? (
+            <Text style={styles.error}>{phoneNumberError}</Text>
+          ) : null}
         </View>
 
         <View style={{ marginBottom: 12 }}>
@@ -66,6 +118,7 @@ const Signup = ({ navigation }) => {
             <TextInput
               placeholder="Enter your password"
               placeholderTextColor={Colors.Black_color}
+              onChangeText={setPassword}
               secureTextEntry={isPasswordShown}
               style={{
                 width: "100%",
@@ -84,6 +137,9 @@ const Signup = ({ navigation }) => {
               )}
             </TouchableOpacity>
           </View>
+          {passwordError ? (
+            <Text style={styles.error}>{passwordError}</Text>
+          ) : null}
         </View>
 
         <View style={styles.Checkbox}>
@@ -97,7 +153,12 @@ const Signup = ({ navigation }) => {
           <Text>I aggree to the terms and conditions</Text>
         </View>
 
-        <Button title="Sign Up" filled style={styles.signup} />
+        <Button
+          title="Sign Up"
+          filled
+          onPress={handleSignup}
+          style={styles.signup}
+        />
 
         <View style={styles.orview}>
           <View style={styles.orline} />
@@ -107,7 +168,7 @@ const Signup = ({ navigation }) => {
 
         <View style={styles.buttomview}>
           <TouchableOpacity
-            onPress={() => console.log("Pressed")}
+            onPress={handleFacebookSignup}
             style={styles.fbButton}
           >
             <Image
@@ -120,7 +181,7 @@ const Signup = ({ navigation }) => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => console.log("Pressed")}
+            onPress={handleGoogleSignup}
             style={styles.fbButton}
           >
             <Image
@@ -195,7 +256,7 @@ const styles = StyleSheet.create({
   phonetext: {
     borderRightWidth: 1,
     width: "10%",
-    marginRight: 5
+    marginRight: 5,
   },
   icon: {
     position: "absolute",
@@ -254,6 +315,10 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontWeight: "bold",
     marginLeft: 6,
+  },
+  error: {
+    color: "red",
+    fontSize: 12,
   },
 });
 

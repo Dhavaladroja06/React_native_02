@@ -6,17 +6,51 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Linking,
+  DeviceEventEmitter,
 } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import Checkbox from "expo-checkbox";
 import { Colors } from "../constants/Colors";
 import Button from "../components/Button";
+import { fetchUserData } from "../hooks/useUserData";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const Login = ({ navigation }) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  
+  const handleGoogleSignup = () => {
+    Linking.openURL("https://accounts.google.com/signup");
+  };
+
+  const handleFacebookSignup = () => {
+    Linking.openURL("https://www.facebook.com/r.php");
+  };
+
+  const handleLogin = async () => {
+    try {
+      const userDataResponse = await fetchUserData();
+
+      const matchedUser = userDataResponse.find(
+        (user) =>
+          user.userData.email.trim() === email.trim() &&
+          user.userData.password === password
+      );
+      if (matchedUser) {
+        await AsyncStorage.setItem('isLoggedIn', 'true');
+        DeviceEventEmitter.emit("UserLogin")
+        navigation.navigate("Home");
+      } else {
+        console.log("Invalid credentials. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.Container}>
@@ -38,6 +72,8 @@ const Login = ({ navigation }) => {
               placeholderTextColor={Colors.Black_color}
               keyboardType="email-address"
               style={styles.Textinputwidth}
+              value={email}
+              onChangeText={setEmail}
             />
           </View>
         </View>
@@ -51,6 +87,9 @@ const Login = ({ navigation }) => {
               placeholderTextColor={Colors.Black_color}
               secureTextEntry={isPasswordShown}
               style={styles.Textinputwidth}
+              value={password}
+              onChangeText={setPassword}
+              maxLength={8}
             />
 
             <TouchableOpacity
@@ -66,18 +105,12 @@ const Login = ({ navigation }) => {
           </View>
         </View>
 
-        <View style={styles.checkboxview}>
-          <Checkbox
-            style={{ marginRight: 8 }}
-            value={isChecked}
-            onValueChange={setIsChecked}
-            color={isChecked ? Colors.primary : undefined}
-          />
-
-          <Text>Remenber Me</Text>
-        </View>
-
-        <Button title="Login" filled style={styles.login} />
+        <Button
+          title="Login"
+          filled
+          style={styles.login}
+          onPress={handleLogin}
+        />
 
         <View style={styles.orView}>
           <View style={styles.ormainview} />
@@ -87,7 +120,7 @@ const Login = ({ navigation }) => {
 
         <View style={styles.ButoomView}>
           <TouchableOpacity
-            onPress={() => console.log("Pressed")}
+            onPress={handleFacebookSignup}
             style={styles.FbButtom}
           >
             <Image
@@ -100,7 +133,7 @@ const Login = ({ navigation }) => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => console.log("Pressed")}
+            onPress={handleGoogleSignup}
             style={styles.FbButtom}
           >
             <Image
@@ -132,6 +165,7 @@ const styles = StyleSheet.create({
   mainview: {
     flex: 1,
     marginHorizontal: 22,
+    marginTop: 50,
   },
   Welcometext: {
     fontSize: 22,
@@ -170,10 +204,6 @@ const styles = StyleSheet.create({
   icon: {
     position: "absolute",
     right: 12,
-  },
-  checkboxview: {
-    flexDirection: "row",
-    marginVertical: 6,
   },
   login: {
     marginTop: 18,
